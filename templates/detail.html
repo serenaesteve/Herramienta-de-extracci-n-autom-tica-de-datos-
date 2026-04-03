@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extracción #{{ extraction.id }} — DocExtract</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --surface: #111118; --surface2: #16161f;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --accent: #e8ff47; --accent-dim: rgba(232,255,71,0.08);
+    --text: #f0f0f0; --muted: #6b6b7a;
+    --error: #ff6b6b; --success: #6bffb8;
+  }
+  body { font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .page { max-width: 860px; margin: 0 auto; padding: 2rem; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted); text-decoration: none;
+    margin-bottom: 2rem; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--text); }
+  .back-link svg { width: 14px; height: 14px; }
+
+  .page-header { margin-bottom: 2rem; }
+  .page-header h1 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  .meta-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .meta-item svg { width: 13px; height: 13px; }
+
+  .doc-type-badge {
+    display: inline-block; padding: 3px 12px; border-radius: 20px;
+    font-size: 11px; letter-spacing: 0.3px; border: 1px solid;
+  }
+  .badge-factura { background: rgba(232,255,71,0.08); border-color: rgba(232,255,71,0.2); color: var(--accent); }
+  .badge-contrato { background: rgba(107,255,184,0.08); border-color: rgba(107,255,184,0.2); color: var(--success); }
+  .badge-albaran { background: rgba(255,179,71,0.1); border-color: rgba(255,179,71,0.2); color: #ffb347; }
+  .badge-dni { background: rgba(147,130,255,0.1); border-color: rgba(147,130,255,0.2); color: #9382ff; }
+  .badge-presupuesto { background: rgba(100,180,255,0.1); border-color: rgba(100,180,255,0.2); color: #64b4ff; }
+  .badge-ticket { background: rgba(255,100,150,0.1); border-color: rgba(255,100,150,0.2); color: #ff6496; }
+  .badge-nomina { background: rgba(255,120,80,0.1); border-color: rgba(255,120,80,0.2); color: #ff7850; }
+  .badge-libre { background: rgba(255,255,255,0.04); border-color: var(--border2); color: var(--muted); }
+
+  .actions { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn {
+    padding: 9px 18px; border-radius: 8px; font-size: 12px;
+    font-family: 'DM Mono', monospace; cursor: pointer;
+    transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none;
+  }
+  .btn svg { width: 13px; height: 13px; }
+  .btn-outline { border: 1px solid var(--border2); background: transparent; color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { border: 1px solid rgba(255,107,107,0.2); background: rgba(255,107,107,0.08); color: var(--error); }
+  .btn-danger:hover { background: rgba(255,107,107,0.15); }
+
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1.5rem; overflow: hidden; }
+  .section-header { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+  .section-body { padding: 20px; }
+
+  .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .data-field { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .data-field-key { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .data-field-val { font-size: 13px; color: var(--text); word-break: break-word; line-height: 1.5; }
+  .data-field-val.null-val { color: var(--muted); font-style: italic; font-size: 12px; }
+
+  .raw-text {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; font-size: 11px; line-height: 1.8; color: var(--muted);
+    white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;
+  }
+
+  .json-viewer {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; font-size: 11px; line-height: 1.8; color: #9382ff;
+    white-space: pre; overflow-x: auto;
+  }
+
+  .confirm-form { display: inline; }
+</style>
+</head>
+<body>
+<div class="page">
+  <a href="{{ url_for('dashboard') }}" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+    Volver al dashboard
+  </a>
+
+  <div class="page-header">
+    <h1>{{ extraction.filename }}</h1>
+    <div class="meta-row">
+      <span class="doc-type-badge badge-{{ extraction.doc_type }}">{{ extraction.doc_type }}</span>
+      <span class="meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        {{ extraction.created_at.strftime('%d/%m/%Y a las %H:%M') }}
+      </span>
+      <span class="meta-item">ID #{{ extraction.id }}</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a href="{{ url_for('export_extraction', extraction_id=extraction.id, fmt='json') }}" class="btn btn-outline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar JSON
+    </a>
+    <a href="{{ url_for('export_extraction', extraction_id=extraction.id, fmt='csv') }}" class="btn btn-outline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar CSV
+    </a>
+    <form class="confirm-form" method="POST" action="{{ url_for('delete_extraction', extraction_id=extraction.id) }}"
+          onsubmit="return confirm('¿Eliminar esta extracción? Esta acción no se puede deshacer.')">
+      <button type="submit" class="btn btn-danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1v2"/></svg>
+        Eliminar
+      </button>
+    </form>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">Datos extraídos</span></div>
+    <div class="section-body">
+      <div class="data-grid">
+        {% for k, v in data.items() %}
+        <div class="data-field">
+          <div class="data-field-key">{{ k }}</div>
+          <div class="data-field-val {% if not v or v == 'No encontrado' %}null-val{% endif %}">
+            {{ v if v and v != 'No encontrado' else 'No encontrado' }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if extraction.raw_text %}
+  <div class="section">
+    <div class="section-header"><span class="section-title">Texto extraído del documento</span></div>
+    <div class="section-body">
+      <div class="raw-text">{{ extraction.raw_text }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">JSON raw</span></div>
+    <div class="section-body">
+      <div class="json-viewer">{{ data | tojson(indent=2) }}</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

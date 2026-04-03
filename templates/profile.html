@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi perfil — DocExtract</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --surface: #111118; --surface2: #16161f;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --accent: #e8ff47; --accent-dim: rgba(232,255,71,0.08);
+    --text: #f0f0f0; --muted: #6b6b7a;
+    --error: #ff6b6b; --success: #6bffb8;
+  }
+  body { font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .page { max-width: 560px; margin: 0 auto; padding: 2rem; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted); text-decoration: none;
+    margin-bottom: 2rem; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--text); }
+  .back-link svg { width: 14px; height: 14px; }
+
+  .page-header { margin-bottom: 2.5rem; }
+  .page-header h1 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+
+  .avatar-big {
+    width: 64px; height: 64px;
+    background: var(--accent-dim); border: 1px solid rgba(232,255,71,0.2);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800; color: var(--accent);
+    font-family: 'Syne', sans-serif; margin-bottom: 1.5rem;
+  }
+
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1.5rem; overflow: hidden; }
+  .section-header { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+  .section-body { padding: 20px; }
+
+  .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-row span:first-child { color: var(--muted); }
+  .info-row span:last-child { color: var(--text); }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: 'DM Mono', monospace; color: var(--text); outline: none; transition: border-color 0.2s; }
+  .field input:focus { border-color: var(--accent); }
+  .field input::placeholder { color: var(--muted); }
+
+  .btn { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-family: 'DM Mono', monospace; cursor: pointer; transition: all 0.15s; border: 1px solid; }
+  .btn-primary { background: var(--accent); color: #0a0a0f; border-color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-danger { background: rgba(255,107,107,0.08); border-color: rgba(255,107,107,0.2); color: var(--error); }
+  .btn-danger:hover { background: rgba(255,107,107,0.15); }
+
+  .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 16px; border: 1px solid; }
+  .alert-error { background: rgba(255,107,107,0.08); border-color: rgba(255,107,107,0.2); color: var(--error); }
+  .alert-success { background: rgba(107,255,184,0.08); border-color: rgba(107,255,184,0.2); color: var(--success); }
+
+  .danger-zone { border-color: rgba(255,107,107,0.15); }
+  .danger-zone .section-header { border-bottom-color: rgba(255,107,107,0.15); }
+  .danger-zone .section-title { color: var(--error); }
+  .danger-warning { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="page">
+  <a href="{{ url_for('dashboard') }}" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+    Volver al dashboard
+  </a>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'error' if cat == 'error' else 'success' }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="avatar-big">{{ user.username[0].upper() }}</div>
+
+  <div class="page-header">
+    <h1>Mi perfil</h1>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">Información de la cuenta</span></div>
+    <div class="section-body">
+      <div class="info-row"><span>Usuario</span><span>{{ user.username }}</span></div>
+      <div class="info-row"><span>Email</span><span>{{ user.email }}</span></div>
+      <div class="info-row"><span>Cuenta creada</span><span>{{ user.created_at.strftime('%d/%m/%Y') }}</span></div>
+      <div class="info-row"><span>Extracciones totales</span><span>{{ user.extractions | length }}</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">Cambiar contraseña</span></div>
+    <div class="section-body">
+      <form method="POST">
+        <input type="hidden" name="action" value="change_password">
+        <div class="field">
+          <label>Contraseña actual</label>
+          <input type="password" name="current_password" required placeholder="••••••••">
+        </div>
+        <div class="field">
+          <label>Nueva contraseña</label>
+          <input type="password" name="new_password" required placeholder="••••••••" minlength="6">
+        </div>
+        <div class="field">
+          <label>Confirmar nueva contraseña</label>
+          <input type="password" name="confirm_password" required placeholder="••••••••" minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary">Actualizar contraseña</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="section danger-zone">
+    <div class="section-header"><span class="section-title">Zona de peligro</span></div>
+    <div class="section-body">
+      <p class="danger-warning">Si eliminas tu cuenta, se borrarán permanentemente todos tus datos y extracciones. Esta acción no se puede deshacer.</p>
+      <form method="POST" onsubmit="return confirm('¿Estás segura? Esta acción eliminará tu cuenta y todos tus datos permanentemente.')">
+        <input type="hidden" name="action" value="delete_account">
+        <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

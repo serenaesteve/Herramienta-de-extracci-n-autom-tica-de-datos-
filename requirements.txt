@@ -1,0 +1,7 @@
+flask
+flask-sqlalchemy
+werkzeug
+requests
+Pillow
+pytesseract
+PyMuPDF

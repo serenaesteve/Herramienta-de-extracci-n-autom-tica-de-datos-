@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if mode == 'login' %}Acceder{% else %}Registrarse{% endif %} — DocExtract</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
+    --accent: #e8ff47;
+    --accent-dim: rgba(232,255,71,0.1);
+    --text: #f0f0f0;
+    --muted: #6b6b7a;
+    --error: #ff6b6b;
+    --success: #6bffb8;
+  }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* LEFT PANEL */
+  .panel-left {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel-left::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(232,255,71,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: auto;
+  }
+
+  .logo-icon {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-icon svg { width: 16px; height: 16px; }
+
+  .hero-text {
+    margin-top: auto;
+    padding-top: 4rem;
+  }
+
+  .hero-text h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-text h1 em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .hero-text p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 340px;
+  }
+
+  .features {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .feature-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* RIGHT PANEL */
+  .panel-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+
+  .auth-box {
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .auth-header { margin-bottom: 2.5rem; }
+  .auth-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .auth-header p { font-size: 12px; color: var(--muted); }
+
+  .field { margin-bottom: 16px; }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232,255,71,0.08);
+  }
+
+  .field input::placeholder { color: var(--muted); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .auth-switch {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .auth-switch a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 400;
+  }
+
+  .auth-switch a:hover { opacity: 0.8; }
+
+  .alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 16px;
+    border: 1px solid;
+  }
+
+  .alert-error {
+    background: rgba(255,107,107,0.08);
+    border-color: rgba(255,107,107,0.2);
+    color: var(--error);
+  }
+
+  .alert-success {
+    background: rgba(107,255,184,0.08);
+    border-color: rgba(107,255,184,0.2);
+    color: var(--success);
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  @media (max-width: 768px) {
+    body { grid-template-columns: 1fr; }
+    .panel-left { display: none; }
+    .panel-right { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="panel-left">
+  <a href="/" class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 16 16" fill="none" stroke="#0a0a0f" stroke-width="2">
+        <rect x="2" y="1" width="9" height="12" rx="1"/>
+        <path d="M5 5h5M5 8h3"/>
+        <path d="M9 10l3 3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    DocExtract
+  </a>
+
+  <div class="hero-text">
+    <h1>Extrae datos.<br><em>Sin</em> esfuerzo<br>manual.</h1>
+    <p>Sube facturas, contratos, albaranes o cualquier documento y obtén los datos estructurados al instante usando IA local con Ollama.</p>
+    <div class="features">
+      <div class="feature"><div class="feature-dot"></div>Procesamiento 100% local, sin enviar datos a la nube</div>
+      <div class="feature"><div class="feature-dot"></div>Compatibilidad con PDF e imágenes escaneadas</div>
+      <div class="feature"><div class="feature-dot"></div>Exportación a JSON y CSV para sistemas de gestión</div>
+      <div class="feature"><div class="feature-dot"></div>Historial completo de todas tus extracciones</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel-right">
+  <div class="auth-box">
+    <div class="auth-header">
+      <h2>{% if mode == 'login' %}Bienvenido de nuevo{% else %}Crear cuenta{% endif %}</h2>
+      <p>{% if mode == 'login' %}Accede a tu espacio de trabajo{% else %}Empieza a extraer datos ahora{% endif %}</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'error' if cat == 'error' else 'success' }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+      {% if mode == 'register' %}
+      <div class="field">
+        <label>Nombre de usuario</label>
+        <input type="text" name="username" placeholder="tu_usuario" required minlength="3">
+      </div>
+      {% endif %}
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="tu@email.com" required>
+      </div>
+
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" name="password" placeholder="••••••••" required minlength="6">
+      </div>
+
+      {% if mode == 'register' %}
+      <div class="field">
+        <label>Confirmar contraseña</label>
+        <input type="password" name="confirm" placeholder="••••••••" required minlength="6">
+      </div>
+      {% endif %}
+
+      <button type="submit" class="btn-primary">
+        {% if mode == 'login' %}Acceder{% else %}Crear cuenta{% endif %}
+      </button>
+    </form>
+
+    <div class="auth-switch">
+      {% if mode == 'login' %}
+        ¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate gratis</a>
+      {% else %}
+        ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
